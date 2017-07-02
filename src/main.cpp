@@ -71,6 +71,7 @@ int main() {
   // MPC is initialized here!
   MPC mpc;
 
+
   h.onMessage([&mpc](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
@@ -92,7 +93,13 @@ int main() {
           double py = j[1]["y"];
           double psi = j[1]["psi"];
           double v = j[1]["speed"];
-
+          double steer_value=j[1]["steering_angle"];
+          double throttle_value=j[1]["throttle"];
+          //latency inclusion
+          double latency = 0.1;
+          px = px + v*cos(psi)*latency;
+          py = py + v*sin(psi)*latency;
+          v = v + throttle_value*latency;
           //psi=psi*(deg2rad(25)*Lf);
           /*
           * TODO: Calculate steering angle and throttle using MPC.
@@ -166,10 +173,10 @@ int main() {
           // the points in the simulator are connected by a Yellow line
 
           json msgJson;
-          double steer_value=-vars[0]/(deg2rad(25));
-          double throttle_value=vars[1];
-          msgJson["steering_angle"] =steer_value;
-          msgJson["throttle"] = throttle_value;
+          double steer_value_new=-vars[0]/(deg2rad(25));
+          double throttle_value_new=vars[1];
+          msgJson["steering_angle"] =steer_value_new;
+          msgJson["throttle"] = throttle_value_new;
           msgJson["mpc_x"] = mpc_x_vals;
           msgJson["mpc_y"] = mpc_y_vals;
           msgJson["next_x"] = next_x_vals;
